@@ -68,3 +68,30 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #9d4dfb;
 }
+
+/* Infinite Scrolling Marquee */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-scroll 40s linear infinite;
+}
+
+.animate-marquee-infinite:hover {
+  animation-play-state: paused;
+}
+
+/* Neon Glow Ticker Border */
+.glow-ticker {
+  box-shadow: 0 -2px 25px rgba(157, 77, 251, 0.2), inset 0 0 15px rgba(157, 77, 251, 0.08);
+}
+

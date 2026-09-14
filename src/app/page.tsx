@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ChangeEvent, DragEvent } from "react";
+import { useState, useRef, useEffect, ChangeEvent, DragEvent } from "react";
 import {
   UploadCloud,
   FileText,
@@ -23,7 +23,16 @@ import {
   KeyRound,
   Lightbulb,
   FileSearch,
+  MessageSquare,
+  Send,
 } from "lucide-react";
+
+interface VisitorComment {
+  id: string | number;
+  name: string;
+  comment: string;
+  created_at?: string;
+}
 
 interface AnalysisResult {
   score?: number;
@@ -113,7 +122,80 @@ export default function HomePage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Visitor comments state
+  const [comments, setComments] = useState<VisitorComment[]>([]);
+  const [commentName, setCommentName] = useState<string>("");
+  const [commentContent, setCommentContent] = useState<string>("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState<boolean>(false);
+  const [commentFeedback, setCommentFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch comments from Supabase API
+  const fetchComments = async () => {
+    try {
+      const res = await fetch("/api/comments");
+      const json = await res.json();
+      if (res.ok && json.data) {
+        setComments(json.data);
+      }
+    } catch (err) {
+      console.warn("Gagal memuat komentar pengunjung:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  // Handle submit comment
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCommentFeedback(null);
+
+    const trimmedName = commentName.trim();
+    const trimmedText = commentContent.trim();
+
+    if (!trimmedName) {
+      setCommentFeedback({ type: "error", message: "Silakan masukkan nama Anda." });
+      return;
+    }
+    if (!trimmedText) {
+      setCommentFeedback({ type: "error", message: "Silakan masukkan komentar Anda." });
+      return;
+    }
+
+    setIsSubmittingComment(true);
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: trimmedName,
+          comment: trimmedText,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Gagal menyimpan komentar.");
+      }
+
+      setCommentFeedback({ type: "success", message: "Komentar berhasil dikirim dan disinkronkan!" });
+      setCommentContent("");
+      // Immediate refetch to update the marquee ticker
+      await fetchComments();
+
+      setTimeout(() => {
+        setCommentFeedback(null);
+      }, 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat mengirim komentar.";
+      setCommentFeedback({ type: "error", message: msg });
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
 
   // File selection handlers
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -811,7 +893,142 @@ export default function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Minimalist Visitor Comment Form */}
+        <section className="mt-16 sm:mt-20 pt-8 border-t border-[#252839]/70 w-full box-border">
+          <div className="max-w-2xl mx-auto bg-[#0d0e16]/95 border border-[#9d4dfb]/30 rounded-2xl p-5 sm:p-7 shadow-[0_0_30px_rgba(157,77,251,0.12)] relative overflow-hidden backdrop-blur-xl hover:border-[#9d4dfb]/60 transition-all duration-300">
+            {/* Top glowing line accent */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#9d4dfb] to-[#f06292]" />
+
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#9d4dfb]/15 border border-[#9d4dfb]/40 flex items-center justify-center text-[#f06292] shadow-[0_0_12px_rgba(157,77,251,0.3)] shrink-0">
+                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white font-mono tracking-tight">
+                    Komentar Pengunjung
+                  </h3>
+                  <p className="text-[11px] sm:text-xs text-[#8d8d9f] font-mono">
+                    Tinggalkan pesan Anda, akan langsung tampil pada teks melayang di bawah.
+                  </p>
+                </div>
+              </div>
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#12131e] border border-[#9d4dfb]/30 text-[11px] font-mono text-[#c084fc] shadow-sm shrink-0">
+                <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_6px_#10b981]" />
+                <span>Live Feed</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleCommentSubmit} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <input
+                    type="text"
+                    value={commentName}
+                    onChange={(e) => setCommentName(e.target.value)}
+                    placeholder="Nama Anda..."
+                    maxLength={60}
+                    className="w-full box-border px-3.5 py-2.5 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 focus:shadow-[0_0_20px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm font-mono text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <input
+                    type="text"
+                    value={commentContent}
+                    onChange={(e) => setCommentContent(e.target.value)}
+                    placeholder="Tuliskan komentar atau testimoni..."
+                    maxLength={300}
+                    className="w-full box-border px-3.5 py-2.5 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 focus:shadow-[0_0_20px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm font-mono text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              {commentFeedback && (
+                <div
+                  className={`p-2.5 rounded-xl text-xs font-mono flex items-center gap-2 ${
+                    commentFeedback.type === "success"
+                      ? "bg-[#0a2318] border border-[#10b981]/50 text-[#6ee7b7] shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                      : "bg-[#2a0e14] border border-[#f43f5e]/50 text-[#fca5a5] shadow-[0_0_15px_rgba(244,63,94,0.2)]"
+                  }`}
+                >
+                  {commentFeedback.type === "success" ? (
+                    <CheckCircle2 className="w-4 h-4 text-[#10b981] shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-[#f43f5e] shrink-0" />
+                  )}
+                  <span>{commentFeedback.message}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-1 gap-2">
+                <span className="text-[10px] text-[#717182] font-mono truncate">
+                  * Komentar disimpan real-time ke database Supabase
+                </span>
+                <button
+                  type="submit"
+                  disabled={isSubmittingComment}
+                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-mono font-bold text-white bg-gradient-to-r from-[#8b2cf5] via-[#9d4dfb] to-[#f06292] hover:from-[#7c1fed] hover:to-[#e91e63] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 shadow-[0_0_20px_rgba(157,77,251,0.35)] hover:shadow-[0_0_30px_rgba(240,98,146,0.5)] cursor-pointer shrink-0"
+                >
+                  {isSubmittingComment ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Mengirim...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Kirim</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
       </main>
+
+      {/* Cyberpunk Neon Horizontal Scrolling Marquee Ticker */}
+      {(() => {
+        const displayComments =
+          comments.length > 0
+            ? comments
+            : [
+                { id: "sample-1", name: "CyberUser", comment: "Sistem AI ATS parser-nya sangat futuristik dan responsif!" },
+                { id: "sample-2", name: "FrontendDev", comment: "Saran missing keywords sangat membantu lolos screening tech stack modern." },
+                { id: "sample-3", name: "RecruiterPro", comment: "Algoritma evaluasi CV yang luar biasa akurat." },
+                { id: "sample-4", name: "SystemAgent", comment: "Koneksi database Supabase online dan berjalan optimal." },
+              ];
+
+        // Duplikasi untuk transisi scrolling infinite yang mulus tanpa jeda
+        const marqueeList = [...displayComments, ...displayComments, ...displayComments, ...displayComments];
+
+        return (
+          <aside aria-label="Komentar Pengunjung Berjalan" className="relative z-20 w-full overflow-hidden border-y border-[#9d4dfb]/30 bg-[#090a12]/95 py-3 glow-ticker backdrop-blur-md">
+            {/* Left & Right Gradient Fade Masks */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#090a0f] to-transparent z-10" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#090a0f] to-transparent z-10" />
+
+            {/* Marquee Track */}
+            <div className="animate-marquee-infinite flex items-center gap-4 sm:gap-6 px-4">
+              {marqueeList.map((item, idx) => (
+                <div
+                  key={`${item.id}-${idx}`}
+                  className="shrink-0 flex items-center gap-2.5 sm:gap-3 px-3.5 sm:px-4 py-2 rounded-xl bg-[#11131f]/90 border border-[#9d4dfb]/35 hover:border-[#f06292]/70 shadow-[0_0_15px_rgba(157,77,251,0.15)] hover:shadow-[0_0_20px_rgba(240,98,146,0.3)] transition-all group backdrop-blur-sm cursor-default"
+                >
+                  <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-gradient-to-r from-[#9d4dfb]/20 to-[#f06292]/20 border border-[#9d4dfb]/40 text-[#f06292] group-hover:text-white group-hover:border-[#f06292] text-xs font-mono font-bold tracking-tight shrink-0 transition-colors">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_6px_#10b981]" />
+                    @{item.name}
+                  </span>
+                  <span className="text-xs sm:text-sm text-[#e2e8f0] group-hover:text-white font-sans leading-none tracking-wide text-glow-purple">
+                    &ldquo;{item.comment}&rdquo;
+                  </span>
+                </div>
+              ))}
+            </div>
+          </aside>
+        );
+      })()}
 
       {/* Cyberpunk Footer */}
       <footer className="relative z-10 border-t border-[#252839] bg-[#08090d] py-6 sm:py-8 px-4 text-center text-xs font-mono text-[#717182]">
