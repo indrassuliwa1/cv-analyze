@@ -25,6 +25,7 @@ import {
   FileSearch,
   MessageSquare,
   Send,
+  X,
 } from "lucide-react";
 
 interface VisitorComment {
@@ -128,8 +129,22 @@ export default function HomePage() {
   const [commentContent, setCommentContent] = useState<string>("");
   const [isSubmittingComment, setIsSubmittingComment] = useState<boolean>(false);
   const [commentFeedback, setCommentFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Tutup modal dengan tombol Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsCommentModalOpen(false);
+      }
+    };
+    if (isCommentModalOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isCommentModalOpen]);
 
   // Fetch comments from Supabase API
   const fetchComments = async () => {
@@ -186,9 +201,11 @@ export default function HomePage() {
       // Immediate refetch to update the marquee ticker
       await fetchComments();
 
+      // Tutup otomatis modal setelah berhasil mengirim komentar
       setTimeout(() => {
+        setIsCommentModalOpen(false);
         setCommentFeedback(null);
-      }, 4000);
+      }, 1000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat mengirim komentar.";
       setCommentFeedback({ type: "error", message: msg });
@@ -893,100 +910,27 @@ export default function HomePage() {
             </div>
           </section>
         )}
-
-        {/* Minimalist Visitor Comment Form */}
-        <section className="mt-16 sm:mt-20 pt-8 border-t border-[#252839]/70 w-full box-border">
-          <div className="max-w-2xl mx-auto bg-[#0d0e16]/95 border border-[#9d4dfb]/30 rounded-2xl p-5 sm:p-7 shadow-[0_0_30px_rgba(157,77,251,0.12)] relative overflow-hidden backdrop-blur-xl hover:border-[#9d4dfb]/60 transition-all duration-300">
-            {/* Top glowing line accent */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#9d4dfb] to-[#f06292]" />
-
-            <div className="flex items-center justify-between gap-3 mb-5">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#9d4dfb]/15 border border-[#9d4dfb]/40 flex items-center justify-center text-[#f06292] shadow-[0_0_12px_rgba(157,77,251,0.3)] shrink-0">
-                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold text-white font-mono tracking-tight">
-                    Komentar Pengunjung
-                  </h3>
-                  <p className="text-[11px] sm:text-xs text-[#8d8d9f] font-mono">
-                    Tinggalkan pesan Anda, akan langsung tampil pada teks melayang di bawah.
-                  </p>
-                </div>
-              </div>
-              <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#12131e] border border-[#9d4dfb]/30 text-[11px] font-mono text-[#c084fc] shadow-sm shrink-0">
-                <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_6px_#10b981]" />
-                <span>Live Feed</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleCommentSubmit} className="space-y-3.5">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-1">
-                  <input
-                    type="text"
-                    value={commentName}
-                    onChange={(e) => setCommentName(e.target.value)}
-                    placeholder="Nama Anda..."
-                    maxLength={60}
-                    className="w-full box-border px-3.5 py-2.5 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 focus:shadow-[0_0_20px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm font-mono text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    type="text"
-                    value={commentContent}
-                    onChange={(e) => setCommentContent(e.target.value)}
-                    placeholder="Tuliskan komentar atau testimoni..."
-                    maxLength={300}
-                    className="w-full box-border px-3.5 py-2.5 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 focus:shadow-[0_0_20px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm font-mono text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none"
-                  />
-                </div>
-              </div>
-
-              {commentFeedback && (
-                <div
-                  className={`p-2.5 rounded-xl text-xs font-mono flex items-center gap-2 ${
-                    commentFeedback.type === "success"
-                      ? "bg-[#0a2318] border border-[#10b981]/50 text-[#6ee7b7] shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-                      : "bg-[#2a0e14] border border-[#f43f5e]/50 text-[#fca5a5] shadow-[0_0_15px_rgba(244,63,94,0.2)]"
-                  }`}
-                >
-                  {commentFeedback.type === "success" ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#10b981] shrink-0" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-[#f43f5e] shrink-0" />
-                  )}
-                  <span>{commentFeedback.message}</span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-1 gap-2">
-                <span className="text-[10px] text-[#717182] font-mono truncate">
-                  * Komentar disimpan real-time ke database Supabase
-                </span>
-                <button
-                  type="submit"
-                  disabled={isSubmittingComment}
-                  className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-mono font-bold text-white bg-gradient-to-r from-[#8b2cf5] via-[#9d4dfb] to-[#f06292] hover:from-[#7c1fed] hover:to-[#e91e63] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 shadow-[0_0_20px_rgba(157,77,251,0.35)] hover:shadow-[0_0_30px_rgba(240,98,146,0.5)] cursor-pointer shrink-0"
-                >
-                  {isSubmittingComment ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Mengirim...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Kirim</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
       </main>
+
+      {/* Marquee & Trigger Button Container */}
+      <div className="relative z-20 w-full mb-1">
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs font-mono text-[#9a9ab0]">
+            <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_6px_#10b981]" />
+            <span className="text-[#c084fc] font-bold">TRANSMISI PENGUNJUNG</span>
+            <span className="hidden sm:inline text-[#4a4d63]">•</span>
+            <span className="hidden sm:inline text-[#7e8099]">Live Community Feed</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsCommentModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-semibold text-[#d8b4fe] hover:text-white bg-[#141522]/80 hover:bg-[#9d4dfb]/20 border border-[#9d4dfb]/40 hover:border-[#9d4dfb] shadow-[0_0_15px_rgba(157,77,251,0.2)] hover:shadow-[0_0_25px_rgba(157,77,251,0.5)] transition-all duration-300 cursor-pointer group"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-[#f06292] group-hover:scale-110 transition-transform" />
+            <span>+ Tulis Komentar</span>
+          </button>
+        </div>
+      </div>
 
       {/* Cyberpunk Neon Horizontal Scrolling Marquee Ticker */}
       {(() => {
@@ -1037,6 +981,125 @@ export default function HomePage() {
           <span className="text-[#9d4dfb] font-medium">Created by Indra Suliwa</span>
         </p>
       </footer>
+
+      {/* Visitor Comment Modal Popup */}
+      {isCommentModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setIsCommentModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-lg bg-[#0d0e16]/95 border border-[#9d4dfb]/40 rounded-2xl p-5 sm:p-7 shadow-[0_0_40px_rgba(157,77,251,0.25)] relative overflow-hidden backdrop-blur-xl animate-in zoom-in-95 duration-200"
+          >
+            {/* Top glowing line accent */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#9d4dfb] to-[#f06292]" />
+
+            {/* Header & Close Button (X) */}
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#9d4dfb]/15 border border-[#9d4dfb]/40 flex items-center justify-center text-[#f06292] shadow-[0_0_12px_rgba(157,77,251,0.3)] shrink-0">
+                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white font-mono tracking-tight">
+                    Komentar Pengunjung
+                  </h3>
+                  <p className="text-[11px] sm:text-xs text-[#8d8d9f] font-mono">
+                    Tinggalkan pesan Anda, akan langsung tampil pada teks melayang di bawah.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCommentModalOpen(false)}
+                className="p-1.5 sm:p-2 text-[#8d8d9f] hover:text-white hover:bg-[#252839]/80 rounded-xl transition-all cursor-pointer shrink-0 border border-transparent hover:border-[#9d4dfb]/40"
+                title="Tutup Modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCommentSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#c084fc] font-medium flex items-center justify-between">
+                  <span>Nama / Alias</span>
+                  <span className="text-[10px] text-[#6b7280]">Maks. 60 Karakter</span>
+                </label>
+                <input
+                  type="text"
+                  value={commentName}
+                  onChange={(e) => setCommentName(e.target.value)}
+                  placeholder="Nama Anda..."
+                  maxLength={60}
+                  className="w-full box-border px-3.5 py-2.5 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 focus:shadow-[0_0_20px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm font-mono text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono text-[#c084fc] font-medium flex items-center justify-between">
+                  <span>Komentar atau Testimoni</span>
+                  <span className="text-[10px] text-[#6b7280]">{commentContent.length}/300</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  placeholder="Tuliskan komentar atau testimoni Anda..."
+                  maxLength={300}
+                  className="w-full box-border px-3.5 py-2.5 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 focus:shadow-[0_0_20px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm font-mono text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none resize-none"
+                />
+              </div>
+
+              {commentFeedback && (
+                <div
+                  className={`p-2.5 rounded-xl text-xs font-mono flex items-center gap-2 ${
+                    commentFeedback.type === "success"
+                      ? "bg-[#0a2318] border border-[#10b981]/50 text-[#6ee7b7] shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                      : "bg-[#2a0e14] border border-[#f43f5e]/50 text-[#fca5a5] shadow-[0_0_15px_rgba(244,63,94,0.2)]"
+                  }`}
+                >
+                  {commentFeedback.type === "success" ? (
+                    <CheckCircle2 className="w-4 h-4 text-[#10b981] shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-[#f43f5e] shrink-0" />
+                  )}
+                  <span>{commentFeedback.message}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCommentModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-mono text-[#9a9ab0] hover:text-white hover:bg-[#1c1d29] border border-[#252839] transition-all cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingComment}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-mono font-bold text-white bg-gradient-to-r from-[#8b2cf5] via-[#9d4dfb] to-[#f06292] hover:from-[#7c1fed] hover:to-[#e91e63] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 shadow-[0_0_20px_rgba(157,77,251,0.35)] hover:shadow-[0_0_30px_rgba(240,98,146,0.5)] cursor-pointer shrink-0"
+                >
+                  {isSubmittingComment ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Mengirim...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Kirim</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
