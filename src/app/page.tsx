@@ -324,9 +324,9 @@ export default function HomePage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-20 sm:pb-24">
+      <main className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-20 sm:pb-24 overflow-x-hidden box-border">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 px-2">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 px-2 w-full box-border">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-[#13141f] border border-[#9d4dfb]/50 text-[#c084fc] text-xs sm:text-sm font-mono font-medium mb-4 sm:mb-6 shadow-[0_0_20px_rgba(157,77,251,0.25)]">
             <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#f06292] shrink-0" />
@@ -347,49 +347,49 @@ export default function HomePage() {
         </div>
 
         {/* Main Body Card with Cyberpunk Glow Perimeter */}
-        <div className="relative rounded-2xl bg-[#0d0e15]/95 backdrop-blur-xl border border-[#9d4dfb]/30 shadow-[0_0_35px_rgba(157,77,251,0.18)] hover:border-[#9d4dfb]/60 transition-all duration-300 overflow-hidden">
+        <div className="relative w-full rounded-2xl bg-[#0d0e15]/95 backdrop-blur-xl border border-[#9d4dfb]/30 shadow-[0_0_35px_rgba(157,77,251,0.18)] hover:border-[#9d4dfb]/60 transition-all duration-300 overflow-hidden box-border">
           {/* Subtle Top Glowing Line Accent */}
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#9d4dfb] to-[#f06292]" />
 
-          {/* Responsive Tabs Selector */}
-          <div className="flex border-b border-[#252839] bg-[#0a0b10] p-1.5 gap-1.5 sm:gap-2">
+          {/* Responsive Tabs Selector (grid-cols-1 on mobile, grid-cols-2 on tablet/desktop) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 border-b border-[#252839] bg-[#0a0b10] p-1.5 sm:p-2 gap-1.5 sm:gap-2 w-full box-border">
             <button
               type="button"
               onClick={() => setActiveTab("upload")}
-              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2.5 py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs md:text-sm font-mono font-semibold transition-all duration-200 cursor-pointer ${
+              className={`w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-mono font-semibold transition-all duration-200 cursor-pointer box-border ${
                 activeTab === "upload"
                   ? "bg-[#161722] text-[#f1f1f6] border border-[#9d4dfb]/50 shadow-[0_0_15px_rgba(157,77,251,0.25)]"
                   : "text-[#8d8d9f] hover:text-[#f1f1f6] hover:bg-[#12131b] border border-transparent"
               }`}
             >
-              <UploadCloud className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${activeTab === "upload" ? "text-[#9d4dfb]" : "text-[#717182]"}`} />
+              <UploadCloud className={`w-4 h-4 shrink-0 ${activeTab === "upload" ? "text-[#9d4dfb]" : "text-[#717182]"}`} />
               <span className="truncate">Berkas CV (PDF / DOCX)</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("paste")}
-              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2.5 py-2.5 sm:py-3 px-2 sm:px-4 rounded-xl text-xs md:text-sm font-mono font-semibold transition-all duration-200 cursor-pointer ${
+              className={`w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-mono font-semibold transition-all duration-200 cursor-pointer box-border ${
                 activeTab === "paste"
                   ? "bg-[#161722] text-[#f1f1f6] border border-[#9d4dfb]/50 shadow-[0_0_15px_rgba(157,77,251,0.25)]"
                   : "text-[#8d8d9f] hover:text-[#f1f1f6] hover:bg-[#12131b] border border-transparent"
               }`}
             >
-              <Terminal className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${activeTab === "paste" ? "text-[#f06292]" : "text-[#717182]"}`} />
+              <Terminal className={`w-4 h-4 shrink-0 ${activeTab === "paste" ? "text-[#f06292]" : "text-[#717182]"}`} />
               <span className="truncate">Salin & Tempel Teks</span>
             </button>
           </div>
 
-          <div className="p-4 sm:p-6 md:p-8 space-y-6">
+          <div className="p-4 sm:p-6 md:p-8 space-y-6 w-full box-border">
             {/* Tab 1: Upload File Area */}
             {activeTab === "upload" && (
-              <div className="transition-all duration-300">
+              <div className="transition-all duration-300 w-full box-border">
                 {!uploadedFile ? (
                   <div
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-xl p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 group ${
+                    className={`w-full border-2 border-dashed rounded-xl p-6 sm:p-12 text-center cursor-pointer transition-all duration-300 group box-border ${
                       isDragging
                         ? "border-[#9d4dfb] bg-[#9d4dfb]/10 shadow-[0_0_30px_rgba(157,77,251,0.3)] scale-[0.99]"
                         : "border-[#252839] hover:border-[#9d4dfb]/60 bg-[#0d0e16]/60 hover:bg-[#13141f]"
@@ -402,10 +402,10 @@ export default function HomePage() {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#151622] border border-[#2d3045] flex items-center justify-center text-[#9d4dfb] group-hover:scale-110 group-hover:border-[#9d4dfb] group-hover:text-white group-hover:shadow-[0_0_20px_rgba(157,77,251,0.5)] transition-all duration-300">
-                      <UploadCloud className="w-8 h-8" />
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl bg-[#151622] border border-[#2d3045] flex items-center justify-center text-[#9d4dfb] group-hover:scale-110 group-hover:border-[#9d4dfb] group-hover:text-white group-hover:shadow-[0_0_20px_rgba(157,77,251,0.5)] transition-all duration-300">
+                      <UploadCloud className="w-7 h-7 sm:w-8 sm:h-8" />
                     </div>
-                    <h3 className="text-base sm:text-lg font-semibold text-[#f1f1f6]">
+                    <h3 className="text-sm sm:text-lg font-semibold text-[#f1f1f6]">
                       Pilih berkas atau seret dokumen ke sini
                     </h3>
                     <p className="text-xs sm:text-sm text-[#8a8a9e] mt-1.5 font-mono">
@@ -414,27 +414,27 @@ export default function HomePage() {
                   </div>
                 ) : (
                   /* Code Editor Style File List Item */
-                  <div className="p-4 sm:p-5 bg-[#12131c] border border-[#9d4dfb]/40 rounded-xl flex items-center justify-between shadow-[0_0_20px_rgba(157,77,251,0.15)] group transition-all">
-                    <div className="flex items-center gap-4 overflow-hidden">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#9d4dfb]/20 to-[#f06292]/20 border border-[#9d4dfb]/40 text-[#f06292] flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(240,98,146,0.3)]">
-                        <FileText className="w-6 h-6" />
+                  <div className="w-full p-4 sm:p-5 bg-[#12131c] border border-[#9d4dfb]/40 rounded-xl flex items-center justify-between shadow-[0_0_20px_rgba(157,77,251,0.15)] group transition-all box-border gap-2">
+                    <div className="flex items-center gap-3 sm:gap-4 overflow-hidden min-w-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-[#9d4dfb]/20 to-[#f06292]/20 border border-[#9d4dfb]/40 text-[#f06292] flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(240,98,146,0.3)]">
+                        <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
-                      <div className="truncate">
-                        <p className="text-sm font-semibold text-[#f1f1f6] truncate font-mono">
+                      <div className="truncate min-w-0">
+                        <p className="text-xs sm:text-sm font-semibold text-[#f1f1f6] truncate font-mono">
                           {uploadedFile.name}
                         </p>
-                        <p className="text-xs text-[#9c9cb0] font-mono mt-0.5">
-                          {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB • <span className="text-[#34d399]">Ready for neural parsing</span>
+                        <p className="text-[10px] sm:text-xs text-[#9c9cb0] font-mono mt-0.5 truncate">
+                          {(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB • <span className="text-[#34d399]">Ready for parsing</span>
                         </p>
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={removeFile}
-                      className="p-2.5 text-[#88889c] hover:text-[#f06292] hover:bg-[#f06292]/15 hover:shadow-[0_0_15px_rgba(240,98,146,0.4)] rounded-xl transition-all duration-200 cursor-pointer"
+                      className="p-2 sm:p-2.5 text-[#88889c] hover:text-[#f06292] hover:bg-[#f06292]/15 hover:shadow-[0_0_15px_rgba(240,98,146,0.4)] rounded-xl transition-all duration-200 cursor-pointer shrink-0"
                       title="Hapus file"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 )}
@@ -443,10 +443,10 @@ export default function HomePage() {
 
             {/* Tab 2: Paste Text Area */}
             {activeTab === "paste" && (
-              <div className="space-y-2 transition-all duration-300">
+              <div className="space-y-2 transition-all duration-300 w-full box-border">
                 <div className="flex justify-between items-center text-xs text-[#9a9ab0] font-mono">
                   <label htmlFor="cv-text-input">Payload Resume / Teks Pengalaman Kerja</label>
-                  <span>{cvText.length} bytes / karakter</span>
+                  <span>{cvText.length} karakter</span>
                 </div>
                 <textarea
                   id="cv-text-input"
@@ -454,60 +454,60 @@ export default function HomePage() {
                   value={cvText}
                   onChange={(e) => setCvText(e.target.value)}
                   placeholder="Tempelkan teks CV Anda di sini (Pengalaman Kerja, Keahlian Teknis, Pendidikan, dll.)..."
-                  className="w-full p-4 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 bg-[#10111a] text-sm font-mono leading-relaxed text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none shadow-inner"
+                  className="w-full box-border p-3.5 sm:p-4 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/40 bg-[#10111a] text-xs sm:text-sm font-mono leading-relaxed text-[#f1f1f6] placeholder-[#5a5a6e] transition-all outline-none shadow-inner resize-y"
                 />
               </div>
             )}
 
             {/* Job Requirements / Description Textarea with Cyberpunk Glow Focus */}
-            <div className="space-y-2">
+            <div className="space-y-2 w-full box-border">
               <div className="flex justify-between items-center text-xs font-mono font-semibold uppercase tracking-wider text-[#9d4dfb]">
                 <label htmlFor="target-role" className="flex items-center gap-1.5">
-                  <FileSearch className="w-4 h-4 text-[#f06292]" />
-                  <span>DESKRIPSI LOWONGAN PEKERJAAN / JOB REQUIREMENTS (OPSIONAL)</span>
+                  <FileSearch className="w-4 h-4 text-[#f06292] shrink-0" />
+                  <span className="truncate">DESKRIPSI LOWONGAN PEKERJAAN (OPSIONAL)</span>
                 </label>
                 {targetRole.length > 0 && (
-                  <span className="text-[#8d8d9f] font-normal lowercase">{targetRole.length} karakter</span>
+                  <span className="text-[#8d8d9f] font-normal lowercase shrink-0">{targetRole.length} char</span>
                 )}
               </div>
-              <div className="relative">
+              <div className="relative w-full box-border">
                 <textarea
                   id="target-role"
                   rows={5}
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                   placeholder="Tempelkan detail kualifikasi atau deskripsi pekerjaan dari portal lowongan (LinkedIn, JobStreet, dll) di sini..."
-                  className="w-full p-4 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/50 focus:shadow-[0_0_25px_rgba(157,77,251,0.35)] bg-[#10111a] text-sm text-[#f1f1f6] placeholder-[#5a5a6e] font-sans transition-all outline-none leading-relaxed shadow-inner resize-y"
+                  className="w-full box-border p-3.5 sm:p-4 rounded-xl border border-[#252839] focus:border-[#9d4dfb] focus:ring-2 focus:ring-[#9d4dfb]/50 focus:shadow-[0_0_25px_rgba(157,77,251,0.35)] bg-[#10111a] text-xs sm:text-sm text-[#f1f1f6] placeholder-[#5a5a6e] font-sans transition-all outline-none leading-relaxed shadow-inner resize-y"
                 />
               </div>
             </div>
 
             {/* Error Message */}
             {errorMessage && (
-              <div className="p-4 rounded-xl bg-[#2a0e14] border border-[#f43f5e]/50 text-[#fecdd3] text-xs sm:text-sm flex items-start gap-3 shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+              <div className="w-full box-border p-3.5 sm:p-4 rounded-xl bg-[#2a0e14] border border-[#f43f5e]/50 text-[#fecdd3] text-xs sm:text-sm flex items-start gap-3 shadow-[0_0_15px_rgba(244,63,94,0.2)]">
                 <AlertCircle className="w-5 h-5 shrink-0 text-[#f43f5e] mt-0.5" />
-                <span className="font-mono">{errorMessage}</span>
+                <span className="font-mono break-words">{errorMessage}</span>
               </div>
             )}
 
             {/* High-Tech Action Button with Purple-to-Pink Diffuse Glow */}
-            <div className="pt-2">
+            <div className="pt-2 w-full box-border">
               <button
                 type="button"
                 disabled={isLoading}
                 onClick={handleAnalyze}
-                className="w-full py-4 px-6 rounded-xl font-mono font-bold text-white bg-gradient-to-r from-[#8b2cf5] via-[#9d4dfb] to-[#f06292] hover:from-[#7c1fed] hover:to-[#e91e63] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none transition-all duration-300 shadow-[0_0_30px_rgba(157,77,251,0.45)] hover:shadow-[0_0_45px_rgba(240,98,146,0.6)] flex items-center justify-center gap-2.5 text-base cursor-pointer tracking-wide border border-white/10"
+                className="w-full box-border py-3.5 sm:py-4 px-4 sm:px-6 rounded-xl font-mono font-bold text-white bg-gradient-to-r from-[#8b2cf5] via-[#9d4dfb] to-[#f06292] hover:from-[#7c1fed] hover:to-[#e91e63] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none transition-all duration-300 shadow-[0_0_30px_rgba(157,77,251,0.45)] hover:shadow-[0_0_45px_rgba(240,98,146,0.6)] flex items-center justify-center gap-2 sm:gap-2.5 text-sm sm:text-base cursor-pointer tracking-wide border border-white/10"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin text-white" />
-                    <span>Mengeksekusi Analisis Neural AI...</span>
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-white shrink-0" />
+                    <span className="truncate">Mengeksekusi Analisis AI...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5 text-white" />
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" />
                     <span>Analisis CV Sekarang</span>
-                    <ArrowRight className="w-5 h-5 ml-1" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1 shrink-0" />
                   </>
                 )}
               </button>
